@@ -1,0 +1,22 @@
+# AWS SDK
+boto3
+
+# Data handling
+pandas
+numpy
+
+# Web scraping
+requests
+beautifulsoup4
+lxml
+
+# Notebook execution & pipeline
+jupyter
+ipykernel
+nbformat
+nbconvert
+papermill
+
+# Visualization
+matplotlib
+seaborn
