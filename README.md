@@ -243,3 +243,70 @@ The resulting table summarizes sentiment differences across countries and serves
 | Uzbekistan (Qaz Inform)    | NEUTRAL            | 0.67%    | 0.07%    | 99.26%  |
 
 This table provides a compact overview of how sentiment related to the “AI bubble” varies across countries, even when the dominant sentiment label is neutral.
+
+### 6. Additional Key Phrase Analysis
+While sentiment analysis showed that coverage of the potential “AI bubble” is largely neutral across countries, it does not explain what aspects of the topic are emphasized by different media outlets. To address this, we extracted key phrases from each article to better understand the thematic focus behind the sentiment scores.
+
+We applied AWS Comprehend’s key phrase extraction to the English text of all articles (both originally English and translated). This allowed us to identify the most salient concepts discussed in each article using a consistent language and model.
+
+The core extraction step was performed with:
+```python
+response = comprehend_client.detect_key_phrases(
+    Text=text_chunk,
+    LanguageCode="en"
+)
+```
+Because raw key phrase extraction often includes irrelevant website or metadata terms, we filtered the output by keeping only high-confidence phrases and removing common navigation or boilerplate patterns. This resulted in a concise set of meaningful phrases for each article.
+
+| Media Source | Top Key Phrases |
+|-------------|----------------|
+| The Guardian (USA) | The question, the AI bubble, the fallout, Edua... |
+| Poland (Vestbee) | the biggest, invitation-only event, an AI bubb... |
+| Australia (9 News) | an AI tech bubble, the valuations, the company... |
+| Japan (Japan Times) | a lawsuit, the Tokyo District Court, Generativ... |
+| Kazakhstan (Astana Times) | ’s Presidency, ’s Presidency, Digital Ecosyste... |
+| Uzbekistan (Qaz Inform) | 2,000 government employees, AI integration ... |
+| Thailand (Bangkok BizNews) | DOLLAR AI BUBBLE, BIG TECH FEARS MARCH, LOANS ... |
+| India (The Times of India) | The boom, Artificial Intelligence, the form, a... |
+| Germany (Handelsblatt) | AI values, The numerous headlines warning, an ... |
+| Russia (Meduza) | the AI boom, a financial bubble, tech companie... |
+| Brazil (CNN Brazil) | an AI bubble, the debate, the company, office ... |
+| France (La Gazette) | An artificial intelligence bubble, The huge ca... |
+
+
+For reporting purposes, we stored a short summary of the most prominent key phrases per article alongside the media source and sentiment label. These per-article summaries were aggregated into a single table and saved as a CSV file in Amazon S3. 
+
+## Findings / Results
+Our sentiment analysis shows a striking consistency across countries: all analyzed articles are classified as neutral by AWS Comprehend. This indicates that media coverage of a potential “AI bubble” is generally cautious, analytical, and balanced rather than overtly optimistic or alarmist.
+
+However, looking beyond the dominant sentiment label reveals important variation in sentiment confidence scores. While neutrality dominates everywhere, the degree of neutrality and the relative presence of negative or positive signals differ across regions.
+
+To illustrate this, we computed and visualized the average sentiment confidence scores (positive, negative, neutral) for each country/media source.
+
+<img width="1179" height="590" alt="image" src="https://github.com/user-attachments/assets/86488b24-8265-49dc-827e-6a7315cc16f0" />
+
+The chart highlights several important patterns:
+
+- Neutral sentiment dominates everywhere, often exceeding 90% confidence, confirming that discussion of the AI bubble is largely framed in an analytical and explanatory manner.
+- India (The Times of India) stands out with a notably higher negative sentiment confidence, suggesting stronger concern about risks or potential downsides compared to other countries.
+- Government- or policy-oriented articles (e.g. Kazakhstan, Uzbekistan) exhibit extremely high neutral confidence, indicating descriptive or informational coverage rather than evaluative commentary.
+
+These differences suggest that, while the overall tone is neutral, regional context influences how strongly risks or concerns are emphasized.
+
+**Insights from key phrase analysis**
+
+Key phrase extraction adds qualitative context to the sentiment findings. Across nearly all articles, the concept of an “AI bubble” appears as a central framing device. Beyond this shared reference point, articles diverge in focus:
+
+- Financial and business-oriented outlets emphasize valuations, companies, investors, and market dynamics.
+- Several Asian and Central Asian sources focus more on government strategy, public sector adoption, and digital infrastructure.
+- Some articles highlight legal, economic, or social consequences, such as regulation, lawsuits, or workforce impact.
+
+This helps explain why sentiment remains neutral overall: many articles discuss potential risks without adopting a strongly negative stance, instead presenting multiple perspectives or outlining possible future scenarios.
+
+## Conclusion
+
+In this project, we analyzed how media outlets in different countries discuss the idea of a possible “AI bubble” using a small but diverse set of news articles. By combining web scraping with AWS services for translation, sentiment analysis, and key phrase extraction, we built a reproducible pipeline to compare coverage across languages and regions.
+
+The results show that discussion of the AI bubble is largely neutral in tone worldwide. At the same time, articles differ in what they focus on: some emphasize market valuations and investor behavior, while others highlight government policy, public sector adoption, or broader economic effects. This suggests that the AI bubble is a shared global topic, but one that is framed differently depending on regional context and media priorities.
+
+Overall, the project demonstrates how AWS serverless AI services can be used to analyze international media narratives in a structured and scalable way, even with a relatively small dataset.
