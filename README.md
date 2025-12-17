@@ -126,3 +126,120 @@ else:
 s3_client.upload_file(local_file_path, S3_BUCKET_NAME, s3_key_prefix + local_file_name)
 ```
 At the end of this step, we had a complete raw-text dataset stored in S3, separated by language. This raw dataset becomes the input for the next stage of the project (translation of non-English articles into English).
+
+### 3.Translating Non-English Articles to English (AWS Translate)
+
+Because our dataset includes articles written in multiple languages, we needed to convert all non-English texts into English before running sentiment analysis. This step ensures we analyze all articles using the same language and the same sentiment model, making cross-country comparison meaningful.
+
+We used [AWS Translate](https://aws.amazon.com/ru/translate/) to translate the non-English articles stored in S3. The input of this step is the “non-English raw articles” folder in our bucket, and the output is a separate “translated articles” folder containing English versions of the same files.
+
+**Main pipeline logic (simplified)**
+
+We first listed all objects stored under the non-English prefix in S3:
+```python
+file_list_response = s3_client.list_objects_v2(
+    Bucket=S3_BUCKET_NAME,
+    Prefix=S3_INPUT_PREFIX
+)
+```
+Then we looped over each file and translated it:
+```python
+for obj in file_list_response["Contents"]:
+    input_key = obj["Key"]
+    if input_key.endswith("/"):
+        continue
+    translate_and_upload_file(S3_BUCKET_NAME, input_key)
+```
+**Handling AWS Translate size limits**
+
+AWS Translate has limits on how much text can be sent in a single request. To avoid failures on long articles, we translated each file in byte-safe chunks and then merged the translated parts back together.
+```python
+translation_response = translate_client.translate_text(
+    Text=string_chunk,
+    SourceLanguageCode="auto",
+    TargetLanguageCode="en"
+)
+translated_text_parts.append(translation_response["TranslatedText"])
+```
+After translating a file, we uploaded the final English text back to S3:
+```python
+output_key = S3_OUTPUT_PREFIX + os.path.basename(input_key)
+
+s3_client.put_object(
+    Bucket=bucket_name,
+    Key=output_key,
+    Body=full_translated_text.encode("utf-8"),
+    ContentType="text/plain"
+)
+```
+At the end of this step, every non-English article had an English version stored in S3. These translated files were then used as input for our sentiment analysis stage.
+
+### 4. Running Sentiment Analysis on All Articles (AWS Comprehend)
+Once all articles were available in English (either originally written in English or translated in the previous step), we ran sentiment analysis using AWS Comprehend. This allowed us to quantify the tone of each article in a consistent way.
+
+We used Comprehend’s synchronous sentiment API (`detect_sentiment`) to produce a sentiment label (POSITIVE / NEGATIVE / NEUTRAL / MIXED) along with confidence scores. For reproducibility and easier downstream processing, we stored each article’s sentiment output as a small JSON file in S3.
+
+At this point, English-language text existed in two places in S3 and we processed both folders:
+
+- the folder containing articles that were originally in English
+- the folder containing translated versions of non-English articles
+
+To comply with AWS Comprehend input size limits, sentiment analysis was performed on a safe portion of each article’s text. The core sentiment analysis call was:
+```python
+response = comprehend_client.detect_sentiment(
+    Text=string_chunk,
+    LanguageCode="en"
+)
+```
+For each article, we stored the sentiment label and confidence scores as a JSON file and uploaded the result back to S3. Each result file includes:
+
+- the source article identifier
+- the detected sentiment
+- confidence scores for positive, negative, neutral, and mixed sentiment
+- a timestamp of the analysis
+
+At the end of this step, every article had a corresponding sentiment result stored in S3. These sentiment outputs served as the input for the final aggregation and comparison stage of the analysis.
+
+### 5. Aggregating Sentiment Results and Comparing Countries
+
+After running sentiment analysis on each article, the output consisted of one JSON file per article stored in Amazon S3. In this final processing step, we aggregated these individual results into a single dataset and created a country-level comparison that could be used directly in the report.
+
+The main goals of this step were to:
+
+1. collect all sentiment outputs from S3,
+2. structure them into a tabular format,
+3. associate each article with a country or region,
+4. compute average sentiment scores per country.
+
+We first listed and downloaded all sentiment result files stored in the S3 results folder:
+```python
+pages = s3_client.get_paginator("list_objects_v2").paginate(
+    Bucket=S3_BUCKET_NAME,
+    Prefix=S3_RESULTS_PREFIX
+)
+```
+Each JSON file was read and added to a list that was later converted into a Pandas DataFrame.
+AWS Comprehend returns sentiment confidence scores as a nested object. To make analysis easier, we flattened these scores into separate numeric columns:
+```python
+df_scores = pd.json_normalize(df["ConfidenceScores"])
+df = pd.concat([df.drop("ConfidenceScores", axis=1), df_scores], axis=1)
+```
+This resulted in one row per article with explicit positive, negative, neutral, and mixed sentiment scores. Then, each article was mapped to a country or region using a predefined mapping based on the source outlet. Finally, we grouped the data by country/region and computed the average sentiment scores.
+The resulting table summarizes sentiment differences across countries and serves as the main quantitative output of the analysis.
+
+| Country/Region             | Dominant_Sentiment | Positive | Negative | Neutral |
+| -------------------------- | ------------------ | -------- | -------- | ------- |
+| Australia (9 News)         | NEUTRAL            | 5.73%    | 0.31%    | 93.11%  |
+| Brazil (CNN Brazil)        | NEUTRAL            | 0.40%    | 9.87%    | 89.65%  |
+| France (La Gazette)        | NEUTRAL            | 9.86%    | 0.26%    | 89.47%  |
+| Germany (Handelsblatt)     | NEUTRAL            | 0.23%    | 1.36%    | 97.43%  |
+| India (Times of India)     | NEUTRAL            | 3.35%    | 35.67%   | 49.37%  |
+| Japan (Japan Times)        | NEUTRAL            | 0.08%    | 1.50%    | 98.39%  |
+| Kazakhstan (Astana Times)  | NEUTRAL            | 0.19%    | 0.00%    | 99.81%  |
+| Poland (Vestbee)           | NEUTRAL            | 13.03%   | 0.05%    | 86.89%  |
+| Russia (Meduza)            | NEUTRAL            | 7.70%    | 2.29%    | 89.27%  |
+| Thailand (Bangkok BizNews) | NEUTRAL            | 3.38%    | 0.64%    | 95.95%  |
+| The Guardian (USA)         | NEUTRAL            | 0.28%    | 0.11%    | 99.58%  |
+| Uzbekistan (Qaz Inform)    | NEUTRAL            | 0.67%    | 0.07%    | 99.26%  |
+
+This table provides a compact overview of how sentiment related to the “AI bubble” varies across countries, even when the dominant sentiment label is neutral.
