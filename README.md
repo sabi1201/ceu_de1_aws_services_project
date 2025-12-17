@@ -53,11 +53,12 @@ To answer our research question, we built a small but complete data analysis pip
 
 At a high level, our approach consisted of the following steps:
 
-1. Creating a dedicated cloud storage location to keep all data and results organized.
-2. Collecting and storing raw article text.
-3. Translating non-English articles into English to enable uniform analysis.
-4. Applying automated sentiment analysis.
-5. Aggregating and visualizing the results for comparison across countries.
+1. Creating a dedicated cloud storage location to keep all data and results organized
+2. Collecting and storing raw article text
+3. Translating non-English articles into English to enable uniform analysis
+4. Applying automated sentiment analysis
+5. Aggregating and visualizing the results for comparison across countries
+6. Extracting key phrases to add qualitative context to the sentiment findings
 
 All steps were implemented in Python using AWS APIs (via `boto3`) and organized into notebooks that can be executed sequentially or as part of an automated pipeline.
 
