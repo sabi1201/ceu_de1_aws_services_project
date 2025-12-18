@@ -13,7 +13,7 @@ Table of Contents
 - [Findings and Results](#findings)
 - [Conclusion](#conclusion)
 - [AWS Cost Breakdown](#aws-cost-breakdown)
-- [Reproducibility](#reproducibility)
+- [Reproducibility](#reproducibility:-how-to-run-this-project-yourself)
 
 
 ## Introduction
