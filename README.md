@@ -1,3 +1,20 @@
+# Comparing Media Sentiment on the “AI Bubble” Across Countries Using AWS
+Table of Contents
+- [Introduction](#introduction)
+- [Problem Definition](#problem-definition)
+- [Dataset and Data Sources](#data-sources)
+- [The Approach](#the-approach)
+  - [1. Creating and Organizing an S3 Bucket](#1-creating-and-organizing-an-s3-bucket)
+  - [2. Article Collection and Language Detection](#2-article-collection-and-language-detection)
+  - [3. Translation of Non-English Articles](#3-translation-of-non-english-articles)
+  - [4. Sentiment Analysis](#4-sentiment-analysis)
+  - [5. Sentiment Comparison Across Countries](#5-sentiment-comparison-across-countries)
+  - [6. Key Phrase Analysis](#6-key-phrase-analysis)
+- [Findings and Results](#findings/results)
+- [Conclusion](#conclusion)
+- [AWS Cost Breakdown](#aws-cost-breakdown)
+
+
 ## Introduction
 
 Artificial intelligence has seen enormous growth in recent years. Large investments, rapid technological progress, and constant media attention have led many to describe the current moment as an **“AI boom.”** At the same time, journalists and analysts increasingly question whether this growth is sustainable or whether it shows the signs of a financial bubble that could eventually burst.
