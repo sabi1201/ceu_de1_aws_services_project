@@ -368,3 +368,6 @@ This will run the notebooks in sequence (bucket setup → scraping → translati
 5) Where to find outputs
 
 After a successful run, you can find raw scraped article text, translated articles, sentiment JSON outputs, aggregated tables (CSV), charts (if saved) in S3.
+
+![Снимок экрана_18-12-2025_19744_eu-west-1 console aws amazon com](https://github.com/user-attachments/assets/611a29ce-5d95-4799-a726-7de52bd54e99)
+
