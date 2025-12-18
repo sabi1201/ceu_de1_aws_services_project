@@ -145,7 +145,7 @@ s3_client.upload_file(local_file_path, S3_BUCKET_NAME, s3_key_prefix + local_fil
 ```
 At the end of this step, we had a complete raw-text dataset stored in S3, separated by language. This raw dataset becomes the input for the next stage of the project (translation of non-English articles into English).
 
-### 3.Translating Non-English Articles to English
+### 3. Translating Non-English Articles to English
 
 Because our dataset includes articles written in multiple languages, we needed to convert all non-English texts into English before running sentiment analysis. This step ensures we analyze all articles using the same language and the same sentiment model, making cross-country comparison meaningful.
 
