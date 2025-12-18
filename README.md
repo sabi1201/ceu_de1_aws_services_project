@@ -10,7 +10,7 @@ Table of Contents
   - [4. Sentiment Analysis](#4-running-sentiment-analysis-on-all-articles)
   - [5. Sentiment Comparison Across Countries](#5-aggregating-sentiment-results-and-comparing-countries)
   - [6. Key Phrase Analysis](#6-additional-key-phrase-analysis)
-- [Findings and Results](#findings-results)
+- [Findings and Results](#findings)
 - [Conclusion](#conclusion)
 - [AWS Cost Breakdown](#aws-cost-breakdown)
 
@@ -145,7 +145,7 @@ s3_client.upload_file(local_file_path, S3_BUCKET_NAME, s3_key_prefix + local_fil
 ```
 At the end of this step, we had a complete raw-text dataset stored in S3, separated by language. This raw dataset becomes the input for the next stage of the project (translation of non-English articles into English).
 
-### 3.Translating Non-English Articles to English (AWS Translate)
+### 3.Translating Non-English Articles to English
 
 Because our dataset includes articles written in multiple languages, we needed to convert all non-English texts into English before running sentiment analysis. This step ensures we analyze all articles using the same language and the same sentiment model, making cross-country comparison meaningful.
 
@@ -192,8 +192,8 @@ s3_client.put_object(
 ```
 At the end of this step, every non-English article had an English version stored in S3. These translated files were then used as input for our sentiment analysis stage.
 
-### 4. Running Sentiment Analysis on All Articles (AWS Comprehend)
-Once all articles were available in English (either originally written in English or translated in the previous step), we ran sentiment analysis using AWS Comprehend. This allowed us to quantify the tone of each article in a consistent way.
+### 4. Running Sentiment Analysis on All Articles
+Once all articles were available in English (either originally written in English or translated in the previous step), we ran sentiment analysis using **AWS Comprehend**. This allowed us to quantify the tone of each article in a consistent way.
 
 We used Comprehend’s synchronous sentiment API (`detect_sentiment`) to produce a sentiment label (POSITIVE / NEGATIVE / NEUTRAL / MIXED) along with confidence scores. For reproducibility and easier downstream processing, we stored each article’s sentiment output as a small JSON file in S3.
 
@@ -294,7 +294,7 @@ Because raw key phrase extraction often includes irrelevant website or metadata 
 
 For reporting purposes, we stored a short summary of the most prominent key phrases per article alongside the media source and sentiment label. These per-article summaries were aggregated into a single table and saved as a CSV file in Amazon S3. 
 
-## Findings / Results
+## Findings
 Our sentiment analysis shows a striking consistency across countries: all analyzed articles are classified as neutral by AWS Comprehend. This indicates that media coverage of a potential “AI bubble” is generally cautious, analytical, and balanced rather than overtly optimistic or alarmist.
 
 However, looking beyond the dominant sentiment label reveals important variation in sentiment confidence scores. While neutrality dominates everywhere, the degree of neutrality and the relative presence of negative or positive signals differ across regions.
