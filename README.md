@@ -2,9 +2,9 @@
 
 Artificial intelligence has seen enormous growth in recent years. Large investments, rapid technological progress, and constant media attention have led many to describe the current moment as an **“AI boom.”** At the same time, journalists and analysts increasingly question whether this growth is sustainable or whether it shows the signs of a financial bubble that could eventually burst.
 
-News media play an important role in shaping how this debate is understood by the public. However, coverage of AI does not look the same everywhere. Economic conditions, political priorities, and local technology ecosystems differ across countries, and these differences may influence how risks and opportunities related to AI are discussed. As a result, reporting on a potential “AI bubble” may vary in tone from one region to another.
+News media play a key role in shaping how this debate is presented to the public. Articles about AI often go beyond technical developments and address broader issues such as investment risk, economic expectations, and long-term societal impact. Because countries differ in their economic conditions, regulatory environments, and technology ecosystems, it is reasonable to expect that media coverage of a potential “AI bubble” may vary across regions.
 
-Comparing media coverage across countries is not straightforward, especially when articles are written in different languages. Cloud-based AI services make it possible to address this challenge by translating text and applying consistent analysis methods. In this project, we use AWS managed services to analyze and compare the sentiment of news articles about a potential AI bubble from multiple countries and regions.
+Understanding these differences can provide insight into how global narratives around AI are formed and communicated.
 
 ## Problem Definition
 **Research Question**: *How does the sentiment of news coverage about a potential “AI bubble” differ across countries and regions?*
