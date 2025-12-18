@@ -12,7 +12,7 @@ Table of Contents
   - [6. Key Phrase Analysis](#6-additional-key-phrase-analysis)
 - [Findings and Results](#findings)
 - [Conclusion](#conclusion)
-- [AWS Cost Breakdown](#aws-cost-breakdown)
+- [AWS Cost Breakdown](#cost-estimation)
 - [Reproducibility](#reproducibility-how-to-run-this-project-yourself)
 
 
@@ -330,7 +330,66 @@ The results show that discussion of the AI bubble is largely neutral in tone wor
 
 Overall, the project demonstrates how AWS serverless AI services can be used to analyze international media narratives in a structured and scalable way, even with a relatively small dataset.
 
-## Cost
+## Cost Estimation
+
+**1. Amazon Comprehend**
+
+To estimate the cost of using Amazon Comprehend, we referred to the official [AWS pricing page](https://aws.amazon.com/comprehend/pricing/)
+
+According to the pricing listed on this page, the following features were used in our project:
+
+- Language Detection: $0.0001 per unit
+- Sentiment Analysis: $0.0001 per unit
+- Key Phrase Extraction: $0.0001 per unit
+
+For Amazon Comprehend, one unit corresponds to 100 characters of text. This means that each of the above features costs $1 per 1 million characters processed when usage remains within the lowest pricing tier.
+
+Our dataset consists of 12 news articles with a combined size of approximately 68,000 characters. Taking trial and error into account, we estimate that Comprehend processed the equivalent of approximately six full passes over the dataset. This results in a total of about 400,000 characters analyzed by Amazon Comprehend across all features.
+
+To compute the estimated cost:
+
+- 400,000 characters ÷ 100 characters per unit = 4,000 units
+- 4,000 units × $0.0001 per unit = $0.40
+
+The estimated total cost for Amazon Comprehend usage in this project is approximately $0.40.
+
+**2. Amazon Translate**
+
+To estimate the cost of using Amazon Translate, we referred to the official [AWS pricing page](https://aws.amazon.com/translate/pricing/)
+
+According to the pricing information on this page, the service used in this project falls under Standard Text Translation, which is priced as follows:
+
+- Standard Text Translation: $15.00 per 1 million characters
+
+In this project, Amazon Translate was used to translate non-English news articles into English so that all articles could be analyzed using the same sentiment and key phrase models.
+Out of the 12 articles in our dataset, 6 were originally published in non-English languages and required translation. Based on the measured character counts of these articles, the total amount of text translated is estimated to be approximately 35,000–40,000 characters.
+During development, the translation step was executed multiple times while testing and debugging the pipeline. Taking this trial-and-error into account, we estimate that up to 80,000 characters were translated in total.
+
+To calculate the cost:
+
+- 80,000 characters ÷ 1,000,000 characters = 0.08
+- 0.08 × $15.00 = $1.20
+
+The estimated total cost for Amazon Translate usage in this project is approximately $1.20.
+
+**3. Amazon S3**
+To estimate storage costs, we referred to the official [AWS S3 pricing page](https://aws.amazon.com/s3/pricing/)
+
+According to the pricing information for S3 Standard storage, the cost is:
+
+- $0.023 per GB per month for the first 50 TB of storage
+
+Amazon S3 was used in this project to store: raw scraped article text files, translated article files, sentiment analysis outputs (JSON), key phrase analysis results (CSV), generated charts and intermediate results.
+
+Based on the actual object sizes stored in the bucket, the total storage used is approximately 1–2 MB, which corresponds to ~0.002 GB.
+
+Estimated monthly storage cost:
+
+- 0.002 GB × $0.023 = $0.000046
+
+Given the very small data volume, the effective Amazon S3 cost for this project is close to zero.
+
+Overall, the total AWS cost for this project is estimated to be approximately $1.60. This cost is mainly driven by Amazon Translate for text translation and Amazon Comprehend for sentiment and key phrase analysis, while Amazon S3 storage costs remain negligible due to the small size of the dataset.
 
 ## Reproducibility: How to Run This Project Yourself
 
