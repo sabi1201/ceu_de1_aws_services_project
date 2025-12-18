@@ -13,6 +13,7 @@ Table of Contents
 - [Findings and Results](#findings)
 - [Conclusion](#conclusion)
 - [AWS Cost Breakdown](#aws-cost-breakdown)
+- [Reproducibility](#reproducibility)
 
 
 ## Introduction
@@ -328,3 +329,42 @@ In this project, we analyzed how media outlets in different countries discuss th
 The results show that discussion of the AI bubble is largely neutral in tone worldwide. At the same time, articles differ in what they focus on: some emphasize market valuations and investor behavior, while others highlight government policy, public sector adoption, or broader economic effects. This suggests that the AI bubble is a shared global topic, but one that is framed differently depending on regional context and media priorities.
 
 Overall, the project demonstrates how AWS serverless AI services can be used to analyze international media narratives in a structured and scalable way, even with a relatively small dataset.
+
+## Cost
+
+## Reproducibility: How to Run This Project Yourself
+
+1) Fork the repository and open a Codespace
+2) Configure AWS credentials (two options)
+
+You need AWS credentials with permission to use at least:
+- S3
+- Translate
+- Comprehend
+
+Option A: Use Codespaces Secrets
+
+Option B: Configure credentials inside the Codespace terminal
+
+Enter:
+
+- AWS Access Key ID
+- AWS Secret Access Key
+- Default region name: eu-west-1
+
+3) Install Python dependencies
+
+From the repository root, run:
+`pip install -r requirements.txt`
+
+4) Run the full pipeline
+
+The project includes a pipeline script that executes the notebooks
+
+`python pipeline.py`
+
+This will run the notebooks in sequence (bucket setup → scraping → translation → sentiment → comparison → key phrases) and save executed versions in the `executed_notebooks/` folder.
+
+5) Where to find outputs
+
+After a successful run, you can find raw scraped article text, translated articles, sentiment JSON outputs, aggregated tables (CSV), charts (if saved) in S3.
